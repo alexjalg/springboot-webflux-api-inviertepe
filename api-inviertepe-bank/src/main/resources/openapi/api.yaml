@@ -369,9 +369,8 @@ components:
       type: object
       properties:
         customerId:
-          type: integer
-          format: int64
-          example: 100000
+          type: string
+          example: 67263e246a2d762658e31892
         type:
           type: string
           description: type of credit card
@@ -389,9 +388,8 @@ components:
       type: object
       properties:
         id:
-          type: integer
-          format: int64
-          example: 100000
+          type: string
+          example: 67263e246a2d762658e31892	
         creditCardNumber:
           type: string
           example: "1234123412341234"

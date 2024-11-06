@@ -17,8 +17,9 @@ public class CreditCard {
 
 	@Id
 	private String id;
-	private String cardNumber;
-	private String creditLimit;
+	private String creditCardNumber;
+	private String type;
+	private double creditLimit;
 	private double balance;
 	private String status;
 	private List<Transaction> transactions;

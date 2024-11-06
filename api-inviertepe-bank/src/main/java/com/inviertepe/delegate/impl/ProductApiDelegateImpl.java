@@ -13,6 +13,7 @@ import org.springframework.web.server.ServerWebExchange;
 
 import com.inviertepe.document.BankAccount;
 import com.inviertepe.document.Customer;
+import com.inviertepe.mapper.ICreditCardMapper;
 import com.inviertepe.server.api.ProductApiDelegate;
 import com.inviertepe.server.dto.BankAccountRequest;
 import com.inviertepe.server.dto.BankAccountResponse;
@@ -34,6 +35,9 @@ public class ProductApiDelegateImpl implements ProductApiDelegate {
 	
 	@Autowired
 	private ICreditCardService creditCardService;
+	
+	@Autowired
+	private ICreditCardMapper creditCardMapper;
 
 	@Override
 	public Mono<ResponseEntity<BankAccountResponse>> addBankAccount(Mono<BankAccountRequest> bankAccountRequest,
@@ -74,22 +78,20 @@ public class ProductApiDelegateImpl implements ProductApiDelegate {
 	@Override
 	public Mono<ResponseEntity<CreditCardResponse>> addCreditCard(Mono<CreditCardRequest> creditCardRequest,
         ServerWebExchange exchange) {
-		return null;
-//        Mono<Void> result = Mono.empty();
-//        exchange.getResponse().setStatusCode(HttpStatus.NOT_IMPLEMENTED);
-//        for (MediaType mediaType : exchange.getRequest().getHeaders().getAccept()) {
-//            if (mediaType.isCompatibleWith(MediaType.valueOf("application/json"))) {
-//                String exampleString = "{ \"balance\" : 15000.0, \"creditCardNumber\" : \"1234123412341234\", \"creditLimit\" : 15000.0, \"id\" : 100000, \"type\" : \"personal\" }";
-//                result = ApiUtil.getExampleResponse(exchange, MediaType.valueOf("application/json"), exampleString);
-//                break;
-//            }
-//            if (mediaType.isCompatibleWith(MediaType.valueOf("application/xml"))) {
-//                String exampleString = "<creditCard> <id>100000</id> <creditCardNumber>1234123412341234</creditCardNumber> <type>personal</type> <creditLimit>15000.0</creditLimit> <balance>15000.0</balance> </creditCard>";
-//                result = ApiUtil.getExampleResponse(exchange, MediaType.valueOf("application/xml"), exampleString);
-//                break;
-//            }
-//        }
-//        return result.then(creditCardRequest).then(Mono.empty());
+		
+		return creditCardRequest
+				.flatMap(request -> {
+					var creditCard = creditCardMapper.toCreditCard(request);
+					var customerId = request.getCustomerId();
+					return creditCardService.save( creditCard, customerId);
+				})
+				.map(savedCreditCard -> {
+					var response = creditCardMapper.toCreditCardResponse(savedCreditCard);
+					return ResponseEntity
+							.created(URI.create(exchange.getRequest().getURI().toString().concat("/").concat(response.getId())))
+							.contentType(MediaType.APPLICATION_JSON)
+							.body(response);
+				});
 
     }
 }
