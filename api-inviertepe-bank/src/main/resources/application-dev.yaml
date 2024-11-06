@@ -1,0 +1,13 @@
+spring:
+  application:
+    name: api-inviertepe-bank
+  data:
+    mongodb:
+      uri: mongodb+srv://usuario:bienvenido@cluster0.wik7s.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0
+      database: inviertepe_database
+server:
+  port: 8082
+springdoc:
+  swagger-ui:
+    disable-swagger-default-url: true
+    path: /api-docs/swagger
