@@ -4,6 +4,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import com.inviertepe.document.Customer;
+import com.inviertepe.server.dto.BalanceResponse;
 import com.inviertepe.server.dto.CustomerRequest;
 import com.inviertepe.server.dto.CustomerResponse;
 
@@ -15,5 +16,8 @@ public interface ICustomerMapper {
 
 	@Mapping(target = "type", expression = "java(com.inviertepe.server.dto.CustomerResponse.TypeEnum.fromValue(customer.getType()))")
 	CustomerResponse toCustomerResponse(Customer customer);
+	
+	@Mapping(target = "customerId", expression = "java(customer.getId())")
+	BalanceResponse toBalanceResponse(Customer customer);
 
 }

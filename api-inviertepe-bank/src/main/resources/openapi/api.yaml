@@ -8,7 +8,7 @@ info:
   version: 1.0.0
 externalDocs:
   description: Project repository
-  url: https://github.com/alexjalg
+  url: https://github.com/alexjalg/springboot-webflux-api-inviertepe
 servers:
   - url: http://localhost:8082/api
 tags:
@@ -159,18 +159,17 @@ paths:
           description: Id of customer to return
           required: true
           schema:
-            type: integer
-            format: int64
+            type: string
       responses:
         '200':
           description: successful operation
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Balance'          
+                $ref: '#/components/schemas/BalanceResponse'          
             application/xml:
               schema:
-                $ref: '#/components/schemas/Balance'
+                $ref: '#/components/schemas/BalanceResponse'
         '400':
           description: Invalid ID supplied
         '404':
@@ -389,7 +388,7 @@ components:
       properties:
         id:
           type: string
-          example: 67263e246a2d762658e31892	
+          example: 67263e246a2d762658e31892  
         creditCardNumber:
           type: string
           example: "1234123412341234"
@@ -470,37 +469,59 @@ components:
           example: 7
       xml:
         name: Loan
-    Balance:
+    BalanceResponse:
       type: object
       properties:
-        id:
-          type: integer
-          format: int64
-          example: 100000
+        customerId:
+          type: string
+          example: 67263e246a2d762658e31833
         name:
           type: string
           example: Jose Alejandro Laura Gonzalo
-        type:
-          type: string
-          description: type of customer
-          example: personal
-          enum:
-            - personal
-            - empresarial
         creditCards:
           type: array
           xml:
             wrapped: true
           items:
-            $ref: '#/components/schemas/CreditCardResponse'
+            $ref: '#/components/schemas/CreditCardBalanceResponse'
         bankAccounts:
           type: array
           xml:
             wrapped: true
           items:
-            $ref: '#/components/schemas/BankAccountResponse'
+            $ref: '#/components/schemas/BankAccountBalanceResponse'
       xml:
         name: balance
+    CreditCardBalanceResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 67263e246a2d762658e31892  
+        creditCardNumber:
+          type: string
+          example: "1234123412341234"
+        balance:
+          type: number
+          format: double
+          example: 15000.00
+      xml:
+        name: creditCardBalance
+    BankAccountBalanceResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          example: 67263e246a2d762658e31892
+        accountNumber:
+          type: string
+          example: "123412341234"
+        balance:
+          type: number
+          format: double
+          example: 15000.00
+      xml:
+        name: bankAccountBalance
     Transaction:
       required:
         - productId
