@@ -20,7 +20,7 @@ public class BankAccount {
 	private String accountNumber;
 	private List<String> holders;
 	private List<String> signatories;
-	private String type;
+	private BankAccountType type;
 	private double balance;
 	private String status;
 	private List<Transaction> transactions;

@@ -7,9 +7,14 @@ import org.springframework.stereotype.Service;
 
 import com.inviertepe.document.BankAccount;
 import com.inviertepe.document.Customer;
+import com.inviertepe.mapper.IBankAccountMapper;
+import com.inviertepe.mapper.ICreditCardMapper;
 import com.inviertepe.repo.IBankAccountRepo;
+import com.inviertepe.repo.IBankAccountTypeRepo;
 import com.inviertepe.repo.ICustomerRepo;
 import com.inviertepe.repo.IGenericRepo;
+import com.inviertepe.server.dto.BankAccountRequest;
+import com.inviertepe.server.dto.BankAccountResponse;
 import com.inviertepe.service.IBankAccountService;
 import com.inviertepe.util.CodeGenerator;
 
@@ -22,7 +27,12 @@ public class BankAccountServiceImpl extends CRUDImpl<BankAccount, String> implem
 	private IBankAccountRepo repo;
 	@Autowired
 	private ICustomerRepo repoCustomer;
-
+	@Autowired
+	private IBankAccountTypeRepo repoBankAccountType;
+	
+	@Autowired
+	private IBankAccountMapper bankAccountMapper;
+	
 	@Override
 	protected IGenericRepo<BankAccount, String> getRepo() {
 		return repo;
@@ -46,6 +56,17 @@ public class BankAccountServiceImpl extends CRUDImpl<BankAccount, String> implem
 							.thenReturn(savedAccount);
 				});
 
+	}
+
+	@Override
+	public Mono<BankAccount> mapToEntity(BankAccountRequest dto) {
+		
+		BankAccount order = bankAccountMapper.toBankAccount(dto);
+        return repoBankAccountType.findByName(dto.getTypeBankAccount().getValue())
+            .map(product -> {
+                order.setType(null);
+                return order;
+            });
 	}
 
 }

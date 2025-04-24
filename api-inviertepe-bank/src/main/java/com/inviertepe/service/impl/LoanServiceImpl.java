@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.validation.annotation.Validated;
 
 import com.inviertepe.document.Loan;
 import com.inviertepe.repo.ICustomerRepo;
@@ -13,9 +14,11 @@ import com.inviertepe.repo.IGenericRepo;
 import com.inviertepe.repo.ILoanRepo;
 import com.inviertepe.service.ILoanService;
 
+import jakarta.validation.Valid;
 import reactor.core.publisher.Mono;
 
 @Service
+@Validated
 public class LoanServiceImpl extends CRUDImpl<Loan, String> implements ILoanService {
 
 	@Autowired
@@ -31,7 +34,7 @@ public class LoanServiceImpl extends CRUDImpl<Loan, String> implements ILoanServ
 	}
 	
 	@Override
-	public Mono<Loan> save(Loan loan){
+	public Mono<Loan> save(@Valid Loan loan){
 		log.info(loan.toString());
 		return repo.save(loan)
 				.flatMap(savedLoan -> {

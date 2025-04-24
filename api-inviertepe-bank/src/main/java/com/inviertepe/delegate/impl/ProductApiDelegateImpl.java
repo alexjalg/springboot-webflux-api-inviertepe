@@ -13,6 +13,7 @@ import org.springframework.web.server.ServerWebExchange;
 
 import com.inviertepe.document.BankAccount;
 import com.inviertepe.document.Customer;
+import com.inviertepe.mapper.IBankAccountMapper;
 import com.inviertepe.mapper.ICreditCardMapper;
 import com.inviertepe.mapper.ICustomerMapper;
 import com.inviertepe.mapper.ILoanMapper;
@@ -52,35 +53,19 @@ public class ProductApiDelegateImpl implements ProductApiDelegate {
 	private ILoanMapper loanMapper;
 	@Autowired
 	private ICustomerMapper customerMapper;
+	@Autowired
+	private IBankAccountMapper bankAccountMapper;
 
 	@Override
 	public Mono<ResponseEntity<BankAccountResponse>> addBankAccount(Mono<BankAccountRequest> bankAccountRequest,
 			ServerWebExchange exchange) {
-		Mono<Customer> monoDocument = Mono.just(new Customer());
-		return  monoDocument
-				.zipWith(bankAccountRequest, (document, request) -> {
-					document.setId(request.getCustomerId());
-					BankAccount bankAccount = new BankAccount();
-					bankAccount.setType(request.getTypeBankAccount().getValue());
-					bankAccount.setBalance(request.getBalance());
-					bankAccount.setSignatories(new ArrayList<>());
-					bankAccount.getSignatories().addAll(request.getSignatories());
-					bankAccount.setHolders(new ArrayList<>());
-					bankAccount.getHolders().addAll(request.getHolders());
-					document.setBankAccounts(new ArrayList<>());
-					document.getBankAccounts().add(bankAccount);
-					log.info(document.toString());
-					return document;
-					})
-				.flatMap(bankAccountService::save)
-				.map(c -> {
-					BankAccountResponse response = new BankAccountResponse();
-					response.setId(c.getId());
-					response.setBankAccountNumber(c.getAccountNumber());
-					c.getHolders().forEach(response::addHoldersItem);
-					c.getSignatories().forEach(response::addSignatoriesItem);
-					response.setTypeBankAccount(TypeBankAccountEnum.fromValue(c.getType()));
-					response.setBalance(c.getBalance());
+		return bankAccountRequest
+				.flatMap(request -> {
+					var bankAccount = bankAccountMapper.toBankAccount(request);
+					return bankAccountService.save(bankAccount);
+				})
+				.map(saved -> {
+					var response = bankAccountMapper.toBankAccountResponse(saved);
 					return ResponseEntity
 							.created(URI.create(exchange.getRequest().getURI().toString().concat("/").concat(response.getId())))
 							.contentType(MediaType.APPLICATION_JSON)

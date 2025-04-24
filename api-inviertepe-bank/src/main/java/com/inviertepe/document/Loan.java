@@ -6,6 +6,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Transient;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -25,6 +27,8 @@ public class Loan {
 	private int termMonths;
 	private List<Transaction> transactions;
 	@Transient
+	@NotNull
+	@NotBlank(message = "El codigo de cliente es obligatorio")
 	private String customerId;
 	
 }
