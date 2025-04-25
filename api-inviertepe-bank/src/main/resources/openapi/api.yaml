@@ -513,7 +513,7 @@ components:
         id:
           type: string
           example: 67263e246a2d762658e31892
-        accountNumber:
+        bankAccountNumber:
           type: string
           example: "123412341234"
         balance:

@@ -1,7 +1,6 @@
 package com.inviertepe.delegate.impl;
 
 import java.net.URI;
-import java.util.ArrayList;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,8 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ServerWebExchange;
 
-import com.inviertepe.document.BankAccount;
-import com.inviertepe.document.Customer;
 import com.inviertepe.mapper.IBankAccountMapper;
 import com.inviertepe.mapper.ICreditCardMapper;
 import com.inviertepe.mapper.ICustomerMapper;
@@ -21,7 +18,6 @@ import com.inviertepe.server.api.ProductApiDelegate;
 import com.inviertepe.server.dto.BalanceResponse;
 import com.inviertepe.server.dto.BankAccountRequest;
 import com.inviertepe.server.dto.BankAccountResponse;
-import com.inviertepe.server.dto.BankAccountResponse.TypeBankAccountEnum;
 import com.inviertepe.server.dto.CreditCardRequest;
 import com.inviertepe.server.dto.CreditCardResponse;
 import com.inviertepe.server.dto.LoanRequest;
@@ -59,11 +55,12 @@ public class ProductApiDelegateImpl implements ProductApiDelegate {
 	@Override
 	public Mono<ResponseEntity<BankAccountResponse>> addBankAccount(Mono<BankAccountRequest> bankAccountRequest,
 			ServerWebExchange exchange) {
+
 		return bankAccountRequest
 				.flatMap(request -> {
-					var bankAccount = bankAccountMapper.toBankAccount(request);
-					return bankAccountService.save(bankAccount);
+					return bankAccountService.toBankAccount(request);
 				})
+				.flatMap(bankAccountService::save)
 				.map(saved -> {
 					var response = bankAccountMapper.toBankAccountResponse(saved);
 					return ResponseEntity
@@ -77,15 +74,15 @@ public class ProductApiDelegateImpl implements ProductApiDelegate {
 	@Override
 	public Mono<ResponseEntity<CreditCardResponse>> addCreditCard(Mono<CreditCardRequest> creditCardRequest,
         ServerWebExchange exchange) {
-		
+		log.info(creditCardRequest.toString());
 		return creditCardRequest
 				.flatMap(request -> {
 					var creditCard = creditCardMapper.toCreditCard(request);
-					var customerId = request.getCustomerId();
-					return creditCardService.save( creditCard, customerId);
+					return creditCardService.save( creditCard );
 				})
 				.map(savedCreditCard -> {
 					var response = creditCardMapper.toCreditCardResponse(savedCreditCard);
+					log.info(response.toString());
 					return ResponseEntity
 							.created(URI.create(exchange.getRequest().getURI().toString().concat("/").concat(response.getId())))
 							.contentType(MediaType.APPLICATION_JSON)
@@ -97,6 +94,7 @@ public class ProductApiDelegateImpl implements ProductApiDelegate {
 	@Override
 	public Mono<ResponseEntity<LoanResponse>> addLoan(Mono<LoanRequest> loanRequest,
         ServerWebExchange exchange) {
+		log.info(loanRequest.toString());
 		return loanRequest
 				.flatMap(request -> {
 					var loan = loanMapper.toLoan(request);
@@ -104,6 +102,7 @@ public class ProductApiDelegateImpl implements ProductApiDelegate {
 				})
 				.map(savedLoan -> {
 					var response = loanMapper.toLoanResponse(savedLoan);
+					log.info(response.toString());
 					return ResponseEntity
 							.created(URI.create(exchange.getRequest().getURI().toString().concat("/").concat(response.getId())))
 							.contentType(MediaType.APPLICATION_JSON)

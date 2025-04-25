@@ -32,21 +32,21 @@ public class CreditCardServiceImpl extends CRUDImpl<CreditCard, String> implemen
 	}
 	
 	@Override
-	public Mono<CreditCard> save(CreditCard creditCard, String customerId){
+	public Mono<CreditCard> save(CreditCard request){
 		return CodeGenerator.generateCreditCardNumber()
 				.flatMap(creditCardNumber -> {
-					creditCard.setCreditCardNumber(creditCardNumber);
-					creditCard.setBalance(creditCard.getCreditLimit());
-					log.info(creditCardNumber);
-					return repo.save(creditCard);
+					request.setCreditCardNumber(creditCardNumber);
+					request.setBalance(request.getCreditLimit());
+					return repo.save(request);
 				})
 				.flatMap(savedCreditCard -> {
-					return repoCustomer.findById(customerId)
+					log.info(savedCreditCard.toString());
+					return repoCustomer.findById(request.getCustomerId())
 							.flatMap(customer -> {
 								if(customer.getCreditCards() == null) {
 									customer.setCreditCards(new ArrayList<>());
 								}
-								customer.getCreditCards().add(creditCard);
+								customer.getCreditCards().add(savedCreditCard);
 								return repoCustomer.save(customer);
 							})
 							.thenReturn(savedCreditCard);

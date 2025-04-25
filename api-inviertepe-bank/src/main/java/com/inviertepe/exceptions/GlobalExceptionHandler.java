@@ -37,6 +37,7 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(ConstraintViolationException.class)
 	@ResponseStatus(HttpStatus.BAD_REQUEST)
 	public ResponseEntity<Map<String, String>> handleConstraintViolationExceptions(ConstraintViolationException ex) {
+		log.info("");
 		Map<String, String> errors = new HashMap<>();
 		ex.getConstraintViolations().forEach(violation -> {
 			String fieldName = violation.getPropertyPath().toString();

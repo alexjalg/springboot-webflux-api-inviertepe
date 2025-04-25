@@ -6,5 +6,5 @@ import reactor.core.publisher.Mono;
 
 public interface ICreditCardService extends ICRUD<CreditCard, String> {
 
-	public Mono<CreditCard> save(CreditCard creditCard, String customerId);
+	public Mono<CreditCard> save(CreditCard creditCard);
 }
